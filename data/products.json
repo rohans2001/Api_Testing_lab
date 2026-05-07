@@ -1,0 +1,29 @@
+[
+  {
+    "id": "p1",
+    "name": "Enterprise Laptop",
+    "description": "High performance laptop for developers",
+    "price": 1299.99,
+    "category": "electronics",
+    "stock": 50,
+    "createdAt": "2023-01-15T00:00:00.000Z"
+  },
+  {
+    "id": "p2",
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse",
+    "price": 49.99,
+    "category": "electronics",
+    "stock": 200,
+    "createdAt": "2023-01-16T00:00:00.000Z"
+  },
+  {
+    "id": "p3",
+    "name": "Coffee Mug",
+    "description": "Ceramic mug, 12oz",
+    "price": 14.99,
+    "category": "home",
+    "stock": 0,
+    "createdAt": "2023-02-01T00:00:00.000Z"
+  }
+]

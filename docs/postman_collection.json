@@ -1,0 +1,73 @@
+{
+  "info": {
+    "name": "Local API Lab (Enterprise Edition)",
+    "description": "Enterprise-style local API testing laboratory.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        { "name": "Register", "request": { "method": "POST", "url": "{{baseUrl}}/api/auth/register", "body": { "mode": "raw", "raw": "{\"name\": \"New User\", \"email\": \"newuser@example.com\", \"password\": \"password123\", \"role\": \"user\"}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Login", "request": { "method": "POST", "url": "{{baseUrl}}/api/auth/login", "body": { "mode": "raw", "raw": "{\"email\": \"admin@example.com\", \"password\": \"password\"}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Profile", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/auth/profile" } },
+        { "name": "Get Sessions", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/auth/sessions" } },
+        { "name": "Delete Session", "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/auth/sessions/SESSION_ID" } }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "Get All Users", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/users" } },
+        { "name": "Delete User", "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/users/USER_ID" } }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        { "name": "Create Job", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/jobs", "body": { "mode": "raw", "raw": "{\"type\": \"export\"}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Get Job Status", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/jobs/JOB_ID/status" } },
+        { "name": "Get Job Result", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/jobs/JOB_ID/result" } }
+      ]
+    },
+    {
+      "name": "Vulnerabilities",
+      "item": [
+        { "name": "IDOR Profile", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/vulnerable/users/ADMIN_ID" } },
+        { "name": "Mass Assignment", "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/vulnerable/profile", "body": { "mode": "raw", "raw": "{\"role\": \"admin\", \"status\": \"active\"}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "Open Redirect", "request": { "method": "GET", "url": "{{baseUrl}}/api/vulnerable/redirect?url=http://evil.com" } }
+      ]
+    },
+    {
+      "name": "Microservices",
+      "item": [
+        { "name": "Order Service (Cascading Failure)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/services/order-service/123?cascade=true" } },
+        { "name": "Inventory Service", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/services/inventory-service" } }
+      ]
+    },
+    {
+      "name": "Third Party Mocks",
+      "item": [
+        { "name": "Stripe Gateway", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/mock/stripe", "body": { "mode": "raw", "raw": "{\"cardNumber\": \"4000000000000001\"}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "Feature Flags",
+      "item": [
+        { "name": "Get Flags", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/feature-flags" } },
+        { "name": "Update Flags", "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ], "url": "{{baseUrl}}/api/feature-flags", "body": { "mode": "raw", "raw": "{\"flag\": \"ENABLE_NEW_CHECKOUT\", \"enabled\": true}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "Testing / Debug",
+      "item": [
+        { "name": "CPU Load", "request": { "method": "GET", "url": "{{baseUrl}}/api/test/cpu-load?ms=2000" } },
+        { "name": "Memory Load", "request": { "method": "GET", "url": "{{baseUrl}}/api/test/memory-load" } },
+        { "name": "Heavy Response", "request": { "method": "GET", "url": "{{baseUrl}}/api/test/heavy-response?size=5000" } }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" }
+  ]
+}

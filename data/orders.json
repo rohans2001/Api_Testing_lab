@@ -1,0 +1,16 @@
+[
+  {
+    "id": "o1",
+    "userId": "f56795ab-8884-47f3-b1d5-bc44040f7d46",
+    "items": [
+      {
+        "productId": "p2",
+        "quantity": 2,
+        "price": 49.99
+      }
+    ],
+    "totalAmount": 99.98,
+    "status": "pending",
+    "createdAt": "2023-03-01T10:00:00.000Z"
+  }
+]

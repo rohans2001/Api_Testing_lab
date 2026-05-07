@@ -1,0 +1,20 @@
+[
+  {
+    "id": "e45695ab-8884-47f3-b1d5-bc44040f7d45",
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "password": "$2a$10$X8Jj6e3o.n.2mO/j0wz9/O8/yvX5iE.Ww9.86vXv6gD8TfE8L7z2O", 
+    "role": "admin",
+    "status": "active",
+    "createdAt": "2023-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "f56795ab-8884-47f3-b1d5-bc44040f7d46",
+    "name": "Test User",
+    "email": "user@example.com",
+    "password": "$2a$10$X8Jj6e3o.n.2mO/j0wz9/O8/yvX5iE.Ww9.86vXv6gD8TfE8L7z2O",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2023-02-01T00:00:00.000Z"
+  }
+]

@@ -1,0 +1,621 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Local API Testing Laboratory",
+    "description": "Enterprise-style local API testing laboratory.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "role": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "User registered" } }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User Login",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful login" } }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User Logout",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful logout" } }
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get user profile",
+        "responses": { "200": { "description": "Profile retrieved" } }
+      }
+    },
+    "/api/auth/sessions": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get active user sessions",
+        "responses": { "200": { "description": "Sessions retrieved" } }
+      }
+    },
+    "/api/auth/sessions/{id}": {
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Delete a session",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Session deleted" } }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users (Admin/Manager)",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Users retrieved" } }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user by ID (Admin)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "User retrieved" } }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Soft delete user (Admin)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "User deleted" } }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get all products",
+        "security": [],
+        "parameters": [
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Products retrieved" } }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create a new product (Admin/Manager)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "stock": { "type": "integer" },
+                  "category": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Product created" } }
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by ID",
+        "security": [],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Product retrieved" } }
+      }
+    },
+    "/api/orders": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create an order",
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": false, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": { "type": "array", "items": { "type": "object" } },
+                  "totalAmount": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Order created" } }
+      },
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get user orders",
+        "responses": { "200": { "description": "Orders retrieved" } }
+      }
+    },
+    "/api/orders/{id}/status": {
+      "patch": {
+        "tags": ["Orders"],
+        "summary": "Update order status (Admin/Manager)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "Idempotency-Key", "in": "header", "required": false, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Status updated" } }
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "tags": ["Cart"],
+        "summary": "Get user cart",
+        "responses": { "200": { "description": "Cart retrieved" } }
+      }
+    },
+    "/api/cart/add": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Add item to cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": { "type": "string" },
+                  "quantity": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Added to cart" } }
+      }
+    },
+    "/api/payments/initiate": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Initiate a payment",
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": false, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": { "type": "string" },
+                  "amount": { "type": "number" },
+                  "cardNumber": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Payment successful" } }
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Upload a single file",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "File uploaded" } }
+      }
+    },
+    "/api/upload/multiple": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Upload multiple files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": { "type": "array", "items": { "type": "string", "format": "binary" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Files uploaded" } }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get user notifications",
+        "responses": { "200": { "description": "Notifications retrieved" } }
+      }
+    },
+    "/api/notifications/send": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Send notification (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "string" },
+                  "type": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Notification sent" } }
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "patch": {
+        "tags": ["Notifications"],
+        "summary": "Mark notification as read",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Marked as read" } }
+      }
+    },
+    "/api/analytics/dashboard": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get dashboard stats (Admin/Manager)",
+        "responses": { "200": { "description": "Stats retrieved" } }
+      }
+    },
+    "/api/webhooks/payment": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Payment webhook simulation",
+        "security": [],
+        "parameters": [
+          { "name": "x-webhook-signature", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object" } } }
+        },
+        "responses": { "200": { "description": "Webhook received" } }
+      }
+    },
+    "/api/webhooks/logs": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "Get webhook DLQ logs",
+        "responses": { "200": { "description": "Logs retrieved" } }
+      }
+    },
+    "/api/jobs": {
+      "post": {
+        "tags": ["Jobs"],
+        "summary": "Create an async background job",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "type": { "type": "string" } } } } }
+        },
+        "responses": { "202": { "description": "Job queued" } }
+      }
+    },
+    "/api/jobs/{id}/status": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get job status",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Status retrieved" } }
+      }
+    },
+    "/api/jobs/{id}/result": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get job result",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Result retrieved" } }
+      }
+    },
+    "/api/feature-flags": {
+      "get": {
+        "tags": ["Feature Flags"],
+        "summary": "Get feature flags",
+        "responses": { "200": { "description": "Flags retrieved" } }
+      },
+      "patch": {
+        "tags": ["Feature Flags"],
+        "summary": "Update feature flags (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "flag": { "type": "string" }, "enabled": { "type": "boolean" } } } } }
+        },
+        "responses": { "200": { "description": "Flag updated" } }
+      }
+    },
+    "/api/services/order-service/{id}": {
+      "get": {
+        "tags": ["Microservices"],
+        "summary": "Simulate cascading service calls",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "cascade", "in": "query", "schema": { "type": "boolean" } }
+        ],
+        "responses": { "200": { "description": "Data retrieved" } }
+      }
+    },
+    "/api/services/inventory-service": {
+      "get": {
+        "tags": ["Microservices"],
+        "summary": "Simulate flaky inventory service",
+        "responses": { "200": { "description": "Data retrieved" }, "503": { "description": "Service Unavailable" } }
+      }
+    },
+    "/api/mock/stripe": {
+      "post": {
+        "tags": ["Third-Party Mocks"],
+        "summary": "Mock Stripe Gateway",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "cardNumber": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "Payment processed" } }
+      }
+    },
+    "/api/mock/email": {
+      "post": {
+        "tags": ["Third-Party Mocks"],
+        "summary": "Mock Email Provider",
+        "responses": { "200": { "description": "Email sent" } }
+      }
+    },
+    "/api/mock/sms": {
+      "post": {
+        "tags": ["Third-Party Mocks"],
+        "summary": "Mock SMS Provider (Always Fails)",
+        "responses": { "500": { "description": "Provider failed" } }
+      }
+    },
+    "/api/vulnerable/users/{id}": {
+      "get": {
+        "tags": ["Vulnerabilities (Security)"],
+        "summary": "IDOR Vulnerability",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "User profile exposed" } }
+      }
+    },
+    "/api/vulnerable/redirect": {
+      "get": {
+        "tags": ["Vulnerabilities (Security)"],
+        "summary": "Open Redirect Vulnerability",
+        "security": [],
+        "parameters": [
+          { "name": "url", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "302": { "description": "Redirected" } }
+      }
+    },
+    "/api/vulnerable/profile": {
+      "patch": {
+        "tags": ["Vulnerabilities (Security)"],
+        "summary": "Mass Assignment Vulnerability",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object" } } }
+        },
+        "responses": { "200": { "description": "Profile updated with arbitrary fields" } }
+      }
+    },
+    "/api/admin/logs": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get system logs (Admin)",
+        "responses": { "200": { "description": "Logs retrieved" } }
+      }
+    },
+    "/api/admin/maintenance-mode": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Toggle maintenance mode (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Maintenance mode toggled" } }
+      }
+    },
+    "/api/test/slow": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test slow response",
+        "security": [],
+        "parameters": [
+          { "name": "delay", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Delayed response" } }
+      }
+    },
+    "/api/test/error": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test intentional error",
+        "security": [],
+        "responses": { "500": { "description": "Server Error" } }
+      }
+    },
+    "/api/test/random-error": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test random error (must enable SIMULATE_RANDOM_ERRORS)",
+        "security": [],
+        "responses": { "200": { "description": "Success or random error" } }
+      }
+    },
+    "/api/test/timeout": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test request timeout",
+        "security": [],
+        "responses": { "200": { "description": "Hangs for 2 mins" } }
+      }
+    },
+    "/api/test/cpu-load": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test CPU load",
+        "security": [],
+        "parameters": [
+          { "name": "ms", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "CPU task completed" } }
+      }
+    },
+    "/api/test/memory-load": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test Memory load",
+        "security": [],
+        "responses": { "200": { "description": "Memory allocation completed" } }
+      }
+    },
+    "/api/test/heavy-response": {
+      "get": {
+        "tags": ["Testing / Debug"],
+        "summary": "Test huge payload generation",
+        "security": [],
+        "parameters": [
+          { "name": "size", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Huge JSON returned" } }
+      }
+    }
+  }
+}

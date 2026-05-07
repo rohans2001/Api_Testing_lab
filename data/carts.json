@@ -1,0 +1,12 @@
+[
+  {
+    "userId": "f56795ab-8884-47f3-b1d5-bc44040f7d46",
+    "items": [
+      {
+        "productId": "p1",
+        "quantity": 1
+      }
+    ],
+    "updatedAt": "2023-04-01T10:00:00.000Z"
+  }
+]
