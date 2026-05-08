@@ -22,15 +22,18 @@ const getSessions = () => {
 const saveSessions = (data) => fs.writeFileSync(sessionsPath, JSON.stringify(data, null, 2));
 
 const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
-  const users = getUsers();
-
-  if (users.find(u => u.email === email)) {
-    return sendError(res, 400, 'User already exists');
-  }
+  const { name, password, role } = req.body;
+  const email = req.body.email.toLowerCase();
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Read users after the async operation to avoid race conditions
+  const users = getUsers();
+
+  if (users.find(u => u.email.toLowerCase() === email)) {
+    return sendError(res, 400, 'User already exists');
+  }
 
   const newUser = {
     id: uuidv4(),
@@ -49,10 +52,11 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email.toLowerCase();
   const users = getUsers();
 
-  const userIndex = users.findIndex(u => u.email === email);
+  const userIndex = users.findIndex(u => u.email.toLowerCase() === email);
   if (userIndex === -1) {
     return sendError(res, 401, 'Invalid credentials');
   }

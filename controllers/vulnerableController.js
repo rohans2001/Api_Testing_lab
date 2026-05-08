@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { sendSuccess, sendError } = require('../utils/responseUtils');
 
 const usersPath = path.join(__dirname, '../data/users.json');
 const getUsers = () => JSON.parse(fs.readFileSync(usersPath, 'utf8'));
@@ -12,10 +13,10 @@ const getAnyUserProfile = (req, res) => {
   const user = users.find(u => u.id === req.params.id);
   
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return sendError(res, 404, 'User profile not found');
   }
   
-  res.status(200).json({ success: true, user });
+  sendSuccess(res, 200, 'User profile retrieved successfully', user);
 };
 
 // 2. Open Redirect
@@ -23,7 +24,7 @@ const redirectUrl = (req, res) => {
   // Vulnerability: Unvalidated redirect parameter
   const target = req.query.url;
   if (!target) {
-    return res.status(400).json({ error: 'Missing url parameter' });
+    return sendError(res, 400, 'Missing url parameter for redirection');
   }
   
   res.redirect(target);
@@ -35,12 +36,12 @@ const updateProfile = (req, res) => {
   const users = getUsers();
   const userIndex = users.findIndex(u => u.id === req.user.id);
   
-  if (userIndex === -1) return res.status(404).json({ error: 'User not found' });
+  if (userIndex === -1) return sendError(res, 404, 'User profile not found');
   
   users[userIndex] = { ...users[userIndex], ...req.body };
   saveUsers(users);
   
-  res.status(200).json({ success: true, user: users[userIndex] });
+  sendSuccess(res, 200, 'User profile updated successfully', users[userIndex]);
 };
 
 module.exports = { getAnyUserProfile, redirectUrl, updateProfile };

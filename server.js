@@ -12,6 +12,7 @@ const swaggerDocument = require('./docs/swagger.json');
 const { graphqlHTTP } = require('express-graphql');
 const { schema, root } = require('./graphql/schema');
 const { protect } = require('./middleware/authMiddleware');
+const { sendSuccess, sendError } = require('./utils/responseUtils');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -137,12 +138,12 @@ app.use('/graphql', graphqlHTTP((req) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date(), version: '1.0.0' });
+  sendSuccess(res, 200, 'API is healthy and running', { timestamp: new Date(), version: '1.0.0' });
 });
 
 // 404 handler
 app.use((req, res, next) => {
-  res.status(404).json({ error: 'Endpoint not found', path: req.originalUrl });
+  sendError(res, 404, 'The requested endpoint could not be found', { path: req.originalUrl });
 });
 
 // Global error handler

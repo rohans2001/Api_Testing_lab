@@ -1,11 +1,12 @@
 const express = require('express');
+const { sendSuccess } = require('../utils/responseUtils');
 const router = express.Router();
 const testController = require('../controllers/testController');
 const { simulateRandomError } = require('../utils/randomErrorUtils');
 
 // Mount random error simulation on this specific route
 router.get('/random-error', simulateRandomError, (req, res) => {
-  res.status(200).json({ success: true, message: 'Lucky! No error this time.' });
+  sendSuccess(res, 200, 'Lucky! No error this time.');
 });
 
 router.get('/slow', testController.getSlowResponse);
@@ -21,7 +22,7 @@ router.get('/heavy-response', (req, res) => {
     description: `This is a heavy description for item ${i} to bloat the payload`,
     timestamp: new Date().toISOString()
   }));
-  res.status(200).json({ success: true, data });
+  sendSuccess(res, 200, 'Large payload generated successfully', data);
 });
 
 router.get('/cpu-load', (req, res) => {
@@ -31,7 +32,7 @@ router.get('/cpu-load', (req, res) => {
     // block event loop
     Math.sqrt(Math.random());
   }
-  res.status(200).json({ success: true, message: `Blocked CPU for ${duration}ms` });
+  sendSuccess(res, 200, `Blocked CPU for ${duration}ms successfully`);
 });
 
 router.get('/memory-load', (req, res) => {
@@ -42,7 +43,7 @@ router.get('/memory-load', (req, res) => {
     }
   } catch (e) {}
   
-  res.status(200).json({ success: true, message: 'Allocated temporary memory' });
+  sendSuccess(res, 200, 'Allocated temporary memory successfully');
 });
 
 module.exports = router;
