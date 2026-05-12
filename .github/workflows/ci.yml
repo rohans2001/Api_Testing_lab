@@ -1,10 +1,10 @@
-name: API Lab CI
+name: API Lab CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master", "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master", "main" ]
 
 jobs:
   build:
@@ -23,3 +23,22 @@ jobs:
         cache: 'npm'
     - run: npm ci
     # - run: npm run test # Uncomment once tests are fully implemented
+
+  deploy:
+    needs: build
+    # Only deploy if the push is to master or main (not on pull requests)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deployment
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not configured in GitHub."
+            echo "Please add it in your repository settings: Settings -> Secrets and variables -> Actions -> New repository secret"
+            exit 1
+          fi
+          echo "Triggering deployment..."
+          curl -s -X POST "$DEPLOY_HOOK"
+          echo "Deployment triggered successfully!"
