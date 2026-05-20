@@ -71,6 +71,11 @@ app.use('/api', rateLimitMiddleware);
 // Static files
 app.use('/uploads', express.static(uploadDir));
 
+// Route to serve the raw swagger.json file
+app.get('/swagger.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'docs', 'swagger.json'));
+});
+
 // Route definitions
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');

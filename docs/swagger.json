@@ -2,8 +2,12 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Local API Testing Laboratory",
-    "description": "Enterprise-style local API testing laboratory.",
+    "description": "Enterprise-style local API testing laboratory. \n\n### Raw Specification\n* [Download OpenAPI JSON](/swagger.json)\n* [View/Copy JSON Link](/swagger.json)",
     "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Raw OpenAPI JSON",
+    "url": "/swagger.json"
   },
   "servers": [
     {
