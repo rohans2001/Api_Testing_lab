@@ -2,11 +2,11 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Local API Testing Laboratory",
-    "description": "Enterprise-style local API testing laboratory. \n\n### Raw Specification\n* [Download OpenAPI JSON](/swagger.json)\n* [View/Copy JSON Link](/swagger.json)",
+    "description": "Enterprise-style local API testing laboratory. This API provides a wide range of endpoints to simulate real-world scenarios, including authentication, user management, product catalog, order processing, and more. It is designed for testing and learning purposes, allowing developers to experiment with various API interactions and edge cases.",
     "version": "1.0.0"
   },
   "externalDocs": {
-    "description": "Raw OpenAPI JSON",
+    "description": "Local API Testing Laboratory.Json",
     "url": "/swagger.json"
   },
   "servers": [
