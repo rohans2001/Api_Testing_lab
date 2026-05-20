@@ -15,12 +15,111 @@
       "description": "Local Development Server"
     }
   ],
+  "tags": [
+    { "name": "Authentication", "description": "Endpoints for managing user authentication and sessions" },
+    { "name": "Users", "description": "User management and administration" },
+    { "name": "Products", "description": "Inventory management and catalog endpoints" },
+    { "name": "Orders", "description": "Order processing and tracking" },
+    { "name": "System", "description": "System health and configuration endpoints" }
+  ],
   "components": {
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string", "enum": ["user", "admin", "manager", "super_admin"] }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "price": { "type": "number" },
+          "stock": { "type": "integer" },
+          "category": { "type": "string" }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string" },
+          "items": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "totalAmount": { "type": "number" },
+          "status": { "type": "string", "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"] }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string" }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string" },
+          "data": { "type": "object" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request - Validation failed",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized - Missing or invalid token",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden - Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
       }
     }
   },
@@ -30,6 +129,43 @@
     }
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Health check endpoint",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "API is healthy and running",
+            "headers": {
+              "X-Request-Id": {
+                "schema": { "type": "string" },
+                "description": "Unique identifier for the request"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "API is healthy and running" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "timestamp": { "type": "string" },
+                        "version": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/api/auth/register": {
       "post": {
         "tags": ["Authentication"],
@@ -51,7 +187,30 @@
             }
           }
         },
-        "responses": { "201": { "description": "User registered" } }
+        "responses": {
+          "201": { 
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": { "$ref": "#/components/schemas/User" },
+                        "token": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
       }
     },
     "/api/auth/login": {
@@ -73,7 +232,31 @@
             }
           }
         },
-        "responses": { "200": { "description": "Successful login" } }
+        "responses": {
+          "200": { 
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": { "$ref": "#/components/schemas/User" },
+                        "token": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
       }
     },
     "/api/auth/logout": {
@@ -94,21 +277,44 @@
             }
           }
         },
-        "responses": { "200": { "description": "Successful logout" } }
+        "responses": { 
+          "200": { "description": "Successful logout" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
       }
     },
     "/api/auth/profile": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Get user profile",
-        "responses": { "200": { "description": "Profile retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "Profile retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
       }
     },
     "/api/auth/sessions": {
       "get": {
         "tags": ["Authentication"],
         "summary": "Get active user sessions",
-        "responses": { "200": { "description": "Sessions retrieved" } }
+        "responses": { 
+          "200": { "description": "Sessions retrieved" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
       }
     },
     "/api/auth/sessions/{id}": {
@@ -118,7 +324,10 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Session deleted" } }
+        "responses": { 
+          "200": { "description": "Session deleted" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
       }
     },
     "/api/users": {
@@ -130,7 +339,28 @@
           { "name": "limit", "in": "query", "schema": { "type": "integer" } },
           { "name": "search", "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Users retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "Users retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
       }
     },
     "/api/users/{id}": {
@@ -140,7 +370,25 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "User retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "User retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
       },
       "delete": {
         "tags": ["Users"],
@@ -148,7 +396,12 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "User deleted" } }
+        "responses": { 
+          "200": { "description": "User deleted" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
       }
     },
     "/api/products": {
@@ -160,7 +413,25 @@
           { "name": "category", "in": "query", "schema": { "type": "string" } },
           { "name": "search", "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Products retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "Products retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Product" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       "post": {
         "tags": ["Products"],
@@ -182,7 +453,12 @@
             }
           }
         },
-        "responses": { "201": { "description": "Product created" } }
+        "responses": { 
+          "201": { "description": "Product created" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
       }
     },
     "/api/products/{id}": {
@@ -193,7 +469,23 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Product retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "Product retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": { "$ref": "#/components/schemas/Product" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
       }
     },
     "/api/orders": {
@@ -217,12 +509,35 @@
             }
           }
         },
-        "responses": { "201": { "description": "Order created" } }
+        "responses": { 
+          "201": { "description": "Order created" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
       },
       "get": {
         "tags": ["Orders"],
         "summary": "Get user orders",
-        "responses": { "200": { "description": "Orders retrieved" } }
+        "responses": {
+          "200": { 
+            "description": "Orders retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Order" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
       }
     },
     "/api/orders/{id}/status": {
@@ -246,7 +561,13 @@
             }
           }
         },
-        "responses": { "200": { "description": "Status updated" } }
+        "responses": { 
+          "200": { "description": "Status updated" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
       }
     },
     "/api/cart": {
